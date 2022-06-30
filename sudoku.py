@@ -2,6 +2,17 @@
 import pygame
 from random import sample, shuffle
 
+board = [
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0]
+]
 testboard = [
     [7,8,0,4,0,0,1,2,0],
     [6,0,0,0,7,5,0,0,9],
@@ -13,6 +24,44 @@ testboard = [
     [1,2,0,0,0,7,4,0,0],
     [0,4,9,2,0,6,0,0,7]
 ]
+def solution(b):
+    lst = list(range(1,10))
+    for i in range(81):
+        x = i//9
+        y = i%9
+        if b[x][y] == 0:
+            shuffle(lst)
+            for num in lst:
+                if is_valid(b, num, (x,y)):
+                    b[x][y] = num
+                    if not check_empty(b):
+                        return True
+                    else:
+                        if solution(b):
+                            return True
+            break
+    b[x][y] = 0
+    return False
+
+def board_create(b):
+    nonempty = get_nonempty(b)
+    filledcount = len(nonempty)
+    rounds = 3
+    while rounds > 3 and filledcount >= 17:
+        x,y = nonempty.pop()
+        filledcount -= 1
+        removed = b[x][y]
+        b[x][y] = 0
+        copy = b.copy()
+        counter = 0
+        solve(copy)
+        if counter != 1:
+            b[x][y] = removed
+            filledcount+= 1
+            rounds -= 1
+    return
+
+
 def printBoard(b):
     for i in range(len(b)):
         if i % 3 == 0 and i != 0:
@@ -27,7 +76,13 @@ def printBoard(b):
             else:
                 print(str(b[i][j]) + " ", end="")
 
-        
+def get_nonempty(b):
+    for i in range(len(b)):
+        for j in range(len(b[0])):
+            if b[i][j] != 0:
+                emptyarr = [(i,j)]
+                return emptyarr
+
 def check_empty(b):
     for i in range(len(b)):
         for j in range(len(b[0])):
@@ -72,7 +127,8 @@ def solve(b):
 
     return False
 
-printBoard(testboard)
-solve(testboard)
-print("----------------------------")
-printBoard(testboard)
+solution(board)
+printBoard(board)
+print("---------------------")
+board_create(board)
+printBoard(board)
